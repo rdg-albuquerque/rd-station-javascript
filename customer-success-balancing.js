@@ -9,11 +9,48 @@ function customerSuccessBalancing(
   customers,
   customerSuccessAway
 ) {
-  /**
-   * ===============================================
-   * =========== Write your solution here ==========
-   * ===============================================
-   */
+  const cssAvailable = customerSuccess.filter((css) => {
+    return !customerSuccessAway.includes(css.id);
+  });
+
+  const cssAvailableAscOrdered = cssAvailable.sort((a, b) => a.score - b.score);
+
+  const cssPerCustomers = [];
+
+  cssAvailableAscOrdered.forEach((currentCss, index) => {
+    const previousCssScore =
+      index === 0 ? 0 : cssAvailableAscOrdered[index - 1].score;
+
+    customers.forEach((customer) => {
+      if (
+        customer.score > previousCssScore &&
+        customer.score <= currentCss.score
+      ) {
+        const registeredCssIndex = cssPerCustomers.findIndex(
+          (registeredCss) => registeredCss.id === currentCss.id
+        );
+
+        if (registeredCssIndex !== -1) {
+          cssPerCustomers[registeredCssIndex].count++;
+        } else {
+          cssPerCustomers.push({
+            id: currentCss.id,
+            count: 1,
+          });
+        }
+      }
+    });
+  });
+
+  if (!cssPerCustomers.length) {
+    return 0;
+  }
+  const arrDesc = cssPerCustomers.sort((a, b) => b.count - a.count);
+
+  const isTied =
+    arrDesc.length > 1 ? arrDesc[0].count === arrDesc[1].count : false;
+
+  return isTied ? 0 : arrDesc[0].id;
 }
 
 test("Scenario 1", () => {
