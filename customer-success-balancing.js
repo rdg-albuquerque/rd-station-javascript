@@ -13,44 +13,42 @@ function customerSuccessBalancing(
     return !customerSuccessAway.includes(css.id);
   });
 
-  const cssAvailableAscOrdered = cssAvailable.sort((a, b) => a.score - b.score);
+  const cssAvailableAscByScore = cssAvailable.sort((a, b) => a.score - b.score);
 
   const cssPerCustomers = [];
 
-  cssAvailableAscOrdered.forEach((currentCss, index) => {
-    const previousCssScore =
-      index === 0 ? 0 : cssAvailableAscOrdered[index - 1].score;
+  customers.forEach((customer) => {
+    const matchingCss = cssAvailableAscByScore.find(
+      (currentCss) => currentCss.score >= customer.score
+    );
 
-    customers.forEach((customer) => {
-      if (
-        customer.score > previousCssScore &&
-        customer.score <= currentCss.score
-      ) {
-        const registeredCssIndex = cssPerCustomers.findIndex(
-          (registeredCss) => registeredCss.id === currentCss.id
-        );
+    if (matchingCss) {
+      const registeredCssIndex = cssPerCustomers.findIndex(
+        (registeredCss) => registeredCss.id === matchingCss.id
+      );
 
-        if (registeredCssIndex !== -1) {
-          cssPerCustomers[registeredCssIndex].count++;
-        } else {
-          cssPerCustomers.push({
-            id: currentCss.id,
-            count: 1,
-          });
-        }
+      if (registeredCssIndex !== -1) {
+        cssPerCustomers[registeredCssIndex].count++;
+      } else {
+        cssPerCustomers.push({
+          id: matchingCss.id,
+          count: 1,
+        });
       }
-    });
+    }
   });
 
   if (!cssPerCustomers.length) {
     return 0;
   }
-  const arrDesc = cssPerCustomers.sort((a, b) => b.count - a.count);
+  const cssPerCustomersDescByCount = cssPerCustomers.sort((a, b) => b.count - a.count);
 
   const isTied =
-    arrDesc.length > 1 ? arrDesc[0].count === arrDesc[1].count : false;
+    cssPerCustomersDescByCount.length > 1
+      ? cssPerCustomersDescByCount[0].count === cssPerCustomersDescByCount[1].count
+      : false;
 
-  return isTied ? 0 : arrDesc[0].id;
+  return isTied ? 0 : cssPerCustomersDescByCount[0].id;
 }
 
 test("Scenario 1", () => {
@@ -153,3 +151,11 @@ test("Scenario 8", () => {
   const csAway = [2, 4];
   expect(customerSuccessBalancing(css, customers, csAway)).toEqual(1);
 });
+
+// // custom tests
+// test("Scenario 9", () => {
+//   const css = mapEntities(['test']);
+//   const customers = mapEntities([]);
+//   const csAway = [2, 4];
+//   expect(customerSuccessBalancing(css, customers, csAway)).toEqual(0);
+// });
