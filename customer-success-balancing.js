@@ -152,10 +152,35 @@ test("Scenario 8", () => {
   expect(customerSuccessBalancing(css, customers, csAway)).toEqual(1);
 });
 
-// // custom tests
-// test("Scenario 9", () => {
-//   const css = mapEntities(['test']);
-//   const customers = mapEntities([]);
-//   const csAway = [2, 4];
-//   expect(customerSuccessBalancing(css, customers, csAway)).toEqual(0);
-// });
+/* custom tests */
+
+test("Scenario 9", () => {
+  const css = mapEntities([11, 21, 31, 3, 4, 5]);
+  const customers = mapEntities([10, 10, 10, 20, 20, 30, 30, 30, 20, 60]);
+  const csAway = [];
+
+  expect(customerSuccessBalancing(css, customers, csAway)).toEqual(0);
+});
+
+test("Scenario 10", () => {
+  const testTimeoutInMs = 100;
+  const testStartTime = new Date().getTime();
+
+  const arraySequence = arraySeq(500, 1);
+  const css = mapEntities(arraySequence);
+  const customers = buildSizeEntities(2000, 499);
+  const csAway = [499];
+
+  expect(customerSuccessBalancing(css, customers, csAway)).toEqual(500);
+
+  if (new Date().getTime() - testStartTime > testTimeoutInMs) {
+    throw new Error(`Test took longer than ${testTimeoutInMs}ms!`);
+  }
+});
+
+test("Scenario 11", () => {
+  const css = mapEntities([30, 50, 70, 90]);
+  const customers = mapEntities([40, 60, 80, 100, 120]);
+  const csAway = [2, 4];
+  expect(customerSuccessBalancing(css, customers, csAway)).toEqual(3);
+});
